@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Forum&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --white-one: #fdfbfb;
+  --black-one: #111111;
+  --filter-one: invert(1);
+  --filter-two: invert(0);
+  --glass-one: rgba(255, 255, 255, 0.716);
+  --glass-two: rgba(0, 0, 0, 0.271);
+}
+
+[data-theme="dark"] {
+  --white-one: #111111;
+  --black-one: #fdfbfb;
+  --filter-one: invert(0);
+  --filter-two: invert(1); 
+  --glass-one: rgba(0, 0, 0, 0.271);
+  --glass-two: rgba(255, 255, 255, 0.716);
+}
+
+* {
+  font-family: "Montserrat", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.font-forum {
+  font-family: "Forum", serif;
+}
+
+.logo-img, .menu-img, .search-img {
+  filter: var(--filter-one);
+}
+
+.search-image {
+  filter: var(--filter-two);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: var(--filter-two);
+  cursor: pointer;
+}
+
+.footer ul li:hover {
+  color: var(--black-one);
+}
