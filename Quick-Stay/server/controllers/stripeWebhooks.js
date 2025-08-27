@@ -1,63 +1,52 @@
-import stripe from "stripe";
+import Stripe from "stripe";
 import Booking from "../models/Booking.js";
 
+// Stripe instance with your secret key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 // API to handle Stripe webhooks
-export const stripeWebhooks = async (request, response) => {
-  // stripe gateway initialization
-  const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
-  const sig = request.headers["stripe-signature"];
+export const stripeWebhooks = async (req, res) => {
+  const sig = req.headers["stripe-signature"];
   let event;
+
   try {
-    event = stripeInstance.webhooks.constructEvent(
-      request.body,
+    // Verify using the webhook signing secret (whsec_...)
+    event = stripe.webhooks.constructEvent(
+      req.body,
       sig,
-      process.env.STRIPE_SECRET_KEY
+      process.env.STRIPE_WEBHOOKS_SECRET   // 👈 using STRIPE_WEBHOOKS_SECRET
     );
     console.log("Stripe webhook event received:", event.type);
   } catch (err) {
-    console.error("Webhook Error:", err.message);
-    return response.status(400).send(`Webhook Error: ${err.message}`);
+    console.error("Webhook verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  // Handle the event
 
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-    const paymentIntentId = paymentIntent.id;
-    console.log("PaymentIntent succeeded:", paymentIntentId);
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
 
-    // Getting the session metadata
-    let session;
-    try {
-      session = await stripeInstance.checkout.sessions.list({
-        payment_intent: paymentIntentId,
-      });
-      console.log("Stripe session list:", session.data);
-    } catch (err) {
-      console.error("Error fetching session:", err);
-      return response.status(500).json({ error: "Error fetching session" });
+      // Read bookingId from metadata
+      const bookingId = session.metadata?.bookingId;
+      if (!bookingId) {
+        console.error("No bookingId found in metadata");
+        return res.status(400).json({ error: "No bookingId found in metadata" });
+      }
+
+      // Mark booking as paid
+      const updateResult = await Booking.findByIdAndUpdate(
+        bookingId,
+        { isPaid: true, paymentMethod: "Stripe" },
+        { new: true }
+      );
+      console.log("Booking updated successfully:", updateResult);
+    } else {
+      console.log("Unhandled event type:", event.type);
     }
 
-    if (!session.data || !session.data[0] || !session.data[0].metadata) {
-      console.error("No session metadata found for paymentIntent:", paymentIntentId);
-      return response.status(400).json({ error: "No session metadata found" });
-    }
-
-    const { bookingId } = session.data[0].metadata;
-    console.log("Booking ID from metadata:", bookingId);
-
-    // Mark Payment as paid
-    try {
-      const updateResult = await Booking.findByIdAndUpdate(bookingId, {
-        isPaid: true,
-        paymentMethod: "Stripe",
-      }, { new: true });
-      console.log("Booking update result:", updateResult);
-    } catch (err) {
-      console.error("Error updating booking:", err);
-      return response.status(500).json({ error: "Error updating booking" });
-    }
-  } else {
-    console.log("Unhandled event type:", event.type);
+    res.status(200).json({ received: true });
+  } catch (err) {
+    console.error("Error handling webhook:", err);
+    res.status(500).json({ error: "Error handling webhook" });
   }
-  response.json({ received: true });
 };
