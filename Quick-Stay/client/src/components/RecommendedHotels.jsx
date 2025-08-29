@@ -27,7 +27,7 @@ const RecommendedHotels = () => {
     <div className="relative flex flex-col items-center px-6 md:px-16 lg:px-24 py-20 bg-[var(--white-one)]">
       <Title
         title="Recommended Hotels"
-        subTitle="Discover our handpicked selection of exceptional properties around the world, offering unparalleled luxury and unforgettable experiences."
+        subTitle="No more endless searching, just the best hotels selected to give you the perfect mix of relaxation, excitement and a joyfull adventures."
       />
 
       {recommended.length === 0 ? (
