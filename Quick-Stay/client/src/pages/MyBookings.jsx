@@ -24,14 +24,15 @@ const MyBookings = () => {
 
   const handlePayment = async (bookingId)=>{
     try {
-      const {data} = await axios.post('/api/bookings/stripe-payment', {bookingId}, {headers: {Authorization: `Bearer ${await getToken()}` }})
-      if (data.success) {
-        window.location.href = data.url
-      }else {
-        toast.error(data.message)
-      }
+      const { data } = await axios.post('/api/bookings/stripe-payment',
+        { bookingId }, {headers: { Authorization: `Bearer ${await getToken()}`}})
+        if (data.success){
+          window.location.href = data.url
+        }else{
+          toast.error(data.message)
+        }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message)
       
     }
   }
@@ -126,10 +127,8 @@ useEffect(()=>{
               </div>
               {!booking.isPaid && (
                 <button
-                  onClick={() => handlePayment(booking._id)}
-                  className="px-4 py-1.5 mt-4 text-xs border border-gray-400
-              rounded-full text-[var(--black-one)] bg-[var(--white-one)] hover:text-[var(--white-one)] hover:bg-[var(--black-one)] transition-all cursor"
-                >
+                onClick={ ()=> handlePayment(booking._id)}
+                  className="px-4 py-1.5 mt-4 text-xs border border-gray-400 rounded-full text-[var(--black-one)] bg-[var(--white-one)] hover:text-[var(--white-one)] hover:bg-[var(--black-one)] transition-all cursor">
                   Pay Now
                 </button>
               )}
@@ -142,3 +141,4 @@ useEffect(()=>{
 };
 
 export default MyBookings;
+
