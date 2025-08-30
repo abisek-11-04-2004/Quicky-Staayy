@@ -21,18 +21,8 @@ export default function JotformChatbot() {
           cursor: "pointer",
         }}
       >
-        <img
-  src="/6a0f84ea-62d9-43a3-a94b-9a42b60ffcbc.png" // your uploaded image path
-  alt="Chatbot Avatar"
-  style={{
-    width: "60px",
-    height: "60px",
-    borderRadius: "50%",       
-    objectFit: "contain",      
-    backgroundColor: "#fff",   
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-  }}
-/>
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" // ✅ Replace with your image if needed alt="Chatbot Avatar" 
+        style={{ width: "60px", height: "60px", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)", }} />
 
       </button>
 
